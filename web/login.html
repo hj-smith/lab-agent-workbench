@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#29261f">
+<title>登录 · 研发工作台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23262522'/%3E%3Cpath d='M4 9h6l5 7h5M4 15h5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2.4' fill='%23c96442'/%3E%3C/svg%3E">
+<style>
+  :root { --ground: #f4f2ec; --surface: #fffefb; --ink: #29261f; --muted: #6b665c; --faint: #8f897c; --line: #e7e2d7; --line-strong: #d4cdbe;
+    --clay: #c96442; --clay-ink: #a14a2b; --clay-soft: #f6e8df; --bad-bg: #f8e5de; --bad-ink: #a0402c; --charcoal: #29261f;
+    font: 16px/1.6 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; color: var(--ink); background: var(--ground); -webkit-text-size-adjust: 100%; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(1200px 600px at 50% -10%, #ece6da 0%, var(--ground) 60%); }
+  .card { width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 30px 28px 26px; box-shadow: 0 14px 40px rgba(41, 38, 31, .08); }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+  .brand svg { flex: none; }
+  .brand b { font-size: 19px; letter-spacing: .04em; }
+  h1 { font-size: 15px; font-weight: 600; margin: 0 0 18px; color: var(--muted); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  input[type=text], input[type=password], input[inputmode] { width: 100%; height: 46px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 14px; font: inherit; color: var(--ink); background: #faf8f3; }
+  input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(201, 100, 66, .15); background: var(--surface); }
+  .code { letter-spacing: .4em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums; }
+  .row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .row input { width: 16px; height: 16px; accent-color: var(--clay); }
+  button { width: 100%; height: 48px; margin-top: 20px; border: 0; border-radius: 10px; background: var(--clay); color: #fff; font: inherit; font-weight: 700; letter-spacing: .1em; cursor: pointer; }
+  button:disabled { opacity: .6; }
+  .error { display: none; margin-top: 14px; background: var(--bad-bg); color: var(--bad-ink); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+  .error.on { display: block; }
+  .back { margin: -6px 0 6px; font-size: 14px; color: var(--muted); }
+  .back b { color: var(--ink); }
+  .back a, .note a { color: var(--clay-ink); cursor: pointer; }
+  .note { margin-top: 18px; font-size: 12.5px; color: var(--faint); line-height: 1.7; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<form class="card" id="form" autocomplete="on">
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#29261f"/><path d="M4 9h6l5 7h5M4 15h5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#c96442"/></svg>
+    <b>研发工作台</b>
+  </div>
+  <h1>登录</h1>
+  <p class="back" id="back" hidden>欢迎回来，<b id="who"></b>。这台设备记住了你，只要输验证码。<br><a id="other">换个账号</a></p>
+  <div id="full">
+    <label for="username">账号</label>
+    <input id="username" type="text" name="username" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <label for="password">密码</label>
+    <input id="password" type="password" name="password" autocomplete="current-password">
+  </div>
+  <label for="code">验证码（验证器里的 6 位数）</label>
+  <input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="14" placeholder="······">
+  <label class="row" id="rememberRow"><input id="remember" type="checkbox" checked> 记住这台设备（30 天内免输密码，验证码每次都要）</label>
+  <button id="go" type="submit">登录</button>
+  <div class="error" id="error"></div>
+  <p class="note">手机丢了或忘了密码：找管理员重发一个邀请。手边没有验证器时，可以用开通时记下的备用码代替验证码（每个只能用一次）。</p>
+</form>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const next = new URLSearchParams(location.search).get('next') || '';
+  let remembered = null;
+  const show = (text) => { $('error').textContent = text; $('error').classList.toggle('on', !!text); };
+  const plain = () => { remembered = null; $('back').hidden = true; $('full').hidden = false; $('rememberRow').hidden = false; $('username').focus(); };
+  fetch('/api/auth/remembered').then((r) => r.json()).then(({person}) => {
+    if (!person) { $('username').focus(); return; }
+    remembered = person; $('who').textContent = person.name || person.username; $('back').hidden = false; $('full').hidden = true; $('rememberRow').hidden = true; $('code').focus();
+  }).catch(() => $('username').focus());
+  $('other').onclick = plain;
+  $('form').onsubmit = async (event) => {
+    event.preventDefault();
+    show(''); $('go').disabled = true; $('go').textContent = '正在登录…';
+    try {
+      const body = remembered ? {code: $('code').value.trim()} : {username: $('username').value.trim(), password: $('password').value, code: $('code').value.trim(), remember: $('remember').checked};
+      const response = await fetch('/api/auth/login', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || '登录没成功');
+      location.replace(next && next.startsWith('/') && !next.startsWith('//') ? next : data.home || '/');
+    } catch (error) {
+      show(error.message); $('code').value = ''; $('code').focus();
+    } finally { $('go').disabled = false; $('go').textContent = '登录'; }
+  };
+</script>
+</body>
+</html>

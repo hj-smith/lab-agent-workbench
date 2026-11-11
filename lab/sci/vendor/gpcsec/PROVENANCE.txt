@@ -1,0 +1,4 @@
+原件：<本机目录>
+epos\wt\gpc-web\src\gpcsec（版本 0.28.7，提交 5e5aff1），2026-11-09 复制。
+复制了：__init__.py、core\、models\、io\__init__.py、io\importers\。一行没改。
+原件用绝对导入 gpcsec.xxx，lab\sci\gpc.py 把 lab\sciendor 放进 sys.path 后导入。

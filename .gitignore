@@ -1,0 +1,15 @@
+# 数据和密钥一律不进仓库
+data/
+数据/
+auth.json
+*.key
+*.db
+*.db-wal
+*.db-shm
+.env
+*.log
+
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/

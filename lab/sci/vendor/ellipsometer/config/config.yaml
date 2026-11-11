@@ -1,0 +1,195 @@
+config_version: "1.3.4"
+program_version: "1.3.4"
+
+headers:
+  search_rows: 20
+  excluded_sheet_prefixes:
+    - "分析摘要"
+    - "SolvA膜厚对比"
+    - "常规单阶段分析"
+    - "光学参数变化"
+    - "标准化测量明细"
+    - "样品统计"
+    - "未配对样品"
+    - "数据质量问题"
+    - "异常值明细"
+    - "异常值影响对照"
+    - "异常值影响图表"
+    - "字段覆盖矩阵"
+    - "解析异常"
+    - "字段映射"
+    - "运行信息"
+    - "配置快照"
+    - "参考样对比"
+    - "参考样指标明细"
+    - "容差应用诊断"
+    - "数据范围与来源"
+    - "分析图表"
+    - "参考样图表"
+    - "参考样NK逐项对比"
+  aliases:
+    sample: ["样品名称", "样品名", "sample", "sample name"]
+    test_count: ["测试次数", "测量次数", "测试编号", "replicate", "次数"]
+    thickness: ["膜厚", "thickness", "厚度"]
+    mse: ["MSE", "均方误差", "拟合误差"]
+
+stage_rules:
+  after_markers:
+    - "^\\s*\\d+\\s*[\\(（]\\s*SolvA\\s*[\\)）]\\s*$"
+    - "^\\s*SolvA\\s*(?:后|处理后)\\s*$"
+    - "^\\s*After\\s+SolvA\\s*$"
+    - "^\\s*SolvA\\s*after\\s*$"
+  # 仅作用于处理后数值区；空列表关闭溶解识别。
+  dissolution_markers: ["溶解", '^\s*[\\＼]\s*$']
+  average_markers:
+    - "^\\s*平均值?\\s*$"
+    - "^\\s*均值\\s*$"
+    - "^\\s*average\\s*$"
+
+sample_parsing:
+  sample_id_patterns:
+    - "(PA-[A-Z0-9]+(?:稀释\\s*\\d+\\s*倍)?)"
+    - "(LT\\d+)"
+    - "([A-Z][A-Z0-9]{1,15}(?:[-_][A-Z0-9]+)+)"
+    - "([A-Z]{1,10}[-_]?[A-Z0-9]{2,})"
+  model_patterns:
+    - "模型\\s*[:：]\\s*([^\\n;；]+)"
+    - "model\\s*[:：]\\s*([^\\n;；]+)"
+  solva_method_keywords: ["表面浸没", "浸泡", "浸没", "旋涂", "冲洗"]
+
+analysis:
+  thickness_unit: "原表膜厚单位"
+  # auto_by_workbook: 整个工作簿无任何 SolvA 后标记时按常规单阶段分析。
+  # auto_by_sheet: 仅无 SolvA 后标记的标签页按常规单阶段分析。
+  # expect_solva: 所有 before-only 样品均提示缺少处理后数据。
+  # force_single_stage: before-only 样品一律按常规单阶段分析。
+  single_stage_mode: "auto_by_workbook"
+  paired_replicates: false
+  decimal_places: 4
+  near_zero_threshold: 1.0e-8
+  optional_welch_test: false
+
+visualization:
+  decimal_places: 4
+  chart_labels:
+    # 图表默认只显示较短的样品编号；完整来源仍保留在悬停和导出明细中。
+    show_source_file: false
+    show_source_sheet: false
+
+quality:
+  average_verification_tolerance: 0.001
+  outlier_method: "iqr"
+  iqr_multiplier: 1.5
+  mad_z_threshold: 3.5
+  minimum_outlier_detection_count: 4
+  outlier_handling:
+    # all_measurements: 主结果保留全部观测（默认）
+    # exclude_thickness_outliers: 主结果使用排除已标记膜厚异常值后的统计
+    # impact_only: 主结果保留全部观测，但输出排除前后影响对照
+    statistics_population: "all_measurements"
+    exclusion_scope: "thickness_only"
+    retain_original_statistics: true
+    export_impact_comparison: true
+    high_exclusion_fraction_warning: null
+  mse_warning_threshold: 20
+  high_cv_threshold_percent: 2.0
+  minimum_replicates: 2
+
+reference_comparison:
+  enabled: true
+  default_mode: "full"
+  after_stage: "after_solva_1"
+  completeness_fields: ["thickness", "n_193", "k_193", "n_248", "k_248", "n_633", "k_633"]
+  grading:
+    # 未设置时仅判断是否在容差内，不把偏离程度主观分成明显/轻微。
+    clear_deviation_multiplier: null
+  allow_cross_condition_comparison: true
+  near_zero_threshold: 1.0e-8
+  default_reference_sample_instance_id: null
+  show_condition_mismatch_warning: true
+  percentage_comparison:
+    output_percentage_point_difference: true
+    output_relative_difference: true
+  tolerances:
+    thickness_before_relative_percent: 2
+    thickness_after_relative_percent: 2
+    thickness_loss_percent_pp: 1
+    retention_percent_pp: 1
+    n_193_absolute: 0.01
+    k_193_absolute: 0.01
+    n_248_absolute: 0.01
+    k_248_absolute: 0.01
+    n_633_absolute: 0.01
+    k_633_absolute: 0.01
+    mse_maximum: 20
+    thickness_cv_maximum: 2
+  condition_matching:
+    source_file: "ignore"
+    solva_condition: "warn"
+    bake_condition: "warn"
+    test_date: "warn"
+    model: "warn"
+    source_sheet: "ignore"
+    measurement_count: "warn"
+  score:
+    enabled: false
+    missing_value_strategy: "exclude_and_reweight"
+    metrics:
+      thickness_loss_percent:
+        weight: 0.30
+        preference: "lower"
+      thickness_retention_percent:
+        weight: 0.20
+        preference: "higher"
+      optical_constant_stability:
+        weight: 0.20
+        preference: "lower"
+      mse_after:
+        weight: 0.10
+        preference: "lower"
+      thickness_cv_after:
+        weight: 0.10
+        preference: "lower"
+      data_completeness:
+        weight: 0.10
+        preference: "higher"
+
+comparison_metrics:
+  thickness_before:
+    preference: "closer_to_reference"
+  thickness_after:
+    preference: "closer_to_reference"
+  thickness_loss:
+    preference: "lower"
+  thickness_loss_percent:
+    preference: "lower"
+  thickness_retention_percent:
+    preference: "higher"
+  mse_before:
+    preference: "lower"
+  mse_after:
+    preference: "lower"
+  thickness_cv_before:
+    preference: "lower"
+  thickness_cv_after:
+    preference: "lower"
+  n_193:
+    preference: "closer_to_reference"
+  k_193:
+    preference: "closer_to_reference"
+  n_248:
+    preference: "closer_to_reference"
+  k_248:
+    preference: "closer_to_reference"
+  n_633:
+    preference: "closer_to_reference"
+  k_633:
+    preference: "closer_to_reference"
+  optical_std:
+    preference: "lower"
+  optical_cv:
+    preference: "lower"
+  optical_drift_magnitude:
+    preference: "lower"
+
+manual_mappings: {}

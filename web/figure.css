@@ -1,0 +1,62 @@
+/* 树脂实验的过程图：温度—时间曲线 + 投料和操作流程。样式从旧树脂模块原样搬来（procedure-editor.css、simple-procedure.css、workspace.css），
+   图本身由树脂计算核心的 procedureCurve / procedureFlow 生成，和旧版设计页、SOP 开头的是同一张。 */
+.pe-figure { --pe-muted: #6b7b80; --pe-line: #dfe7e7; --pe-teal: #2f7d74; --pe-soft: #e7f2f0; --pe-ink: #243337; color: var(--pe-ink); font-size: 13px; line-height: 1.5; }
+.pe-subtle{color:var(--pe-muted);font-size:12px}
+.pe-subtle:empty{display:none}
+.pe-warning{display:block;color:#94651e;background:#fbf4e5;padding:4px 7px;border-radius:5px;margin:5px 0}
+.pe-subtle{display:block;font-size:10px;margin-top:3px}
+.pe-subtle{margin:9px 0 0}
+.pe-curve{width:100%;overflow-x:auto}
+.pe-curve svg{width:100%;min-width:480px;display:block}
+.pe-curve text{font:11px 'Microsoft YaHei',system-ui,sans-serif;fill:#52666b}
+.pe-empty{padding:20px 12px;text-align:center;color:var(--pe-muted);font-size:13px}
+.pe-curve svg{min-width:440px}
+.sp-visual-body{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+.sp-visual .pe-curve svg{min-width:460px}
+.sp-visual .pe-subtle{margin:2px 0 0}
+.sp-flow .pe-flow{flex-direction:column;align-items:stretch;gap:0}
+.sp-flow .pe-flow-arrow{display:none}
+.sp-flow .pe-flow-node{position:relative;min-width:0;padding:3px 0 5px 18px;border:none;border-left:2px solid #d8e5e2;border-radius:0;background:none;text-align:left;font-size:12px}
+.sp-flow .pe-flow-node:last-child{border-left-color:transparent}
+.sp-flow .pe-flow-node::before{content:'';position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #7fb3aa}
+.sp-flow .pe-flow-node small{display:inline;margin:0 0 0 6px}
+.sp-flow .pe-flow-outputs{display:inline-flex;margin:0 0 0 6px;gap:4px}
+.sp-flow .pe-flow-outputs span{padding:0 6px}
+@media (max-width:1000px){.sp-visual-body{grid-template-columns:1fr}}
+.pe-flow2 .pe-route.route-c{border-top-color:#6a4fa3}.pe-flow2 .pe-route.route-c .pe-route-name{color:#5b4291}
+.pe-flow2 .pe-route.route-d{border-top-color:#2f7d74}.pe-flow2 .pe-route.route-d .pe-route-name{color:#23695f}
+.pe-flow2 .pe-route.route-a{border-top-color:#1d5ca8}.pe-flow2 .pe-route.route-a .pe-route-name{color:#1d5ca8}
+.pe-flow2 .pe-route.route-b{border-top-color:#d9601f}.pe-flow2 .pe-route.route-b .pe-route-name{color:#b04a17}
+.sp-flow .pe-flow2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;font-size:13px;line-height:1.45;align-items:start}
+.pe-flow2 .pe-lane{padding:8px 10px 6px 12px;border-radius:8px;background:#f5faf8;border:1px solid #deebe7}
+.pe-flow2 .pe-lane-workup{background:#fbf7ee;border-color:#eddfc0}
+.pe-flow2 .pe-lane-name{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:#2f7d74;margin-bottom:4px}
+.pe-flow2 .pe-lane-workup>.pe-lane-name{color:#a5762a}
+.pe-flow2 ol{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid #cfe1dc}
+.pe-flow2 .pe-lane-workup ol{border-left-color:#e6d2a6}
+.pe-flow2 .pe-node{position:relative;padding:3px 0 6px 2px;display:flex;flex-wrap:wrap;gap:3px 6px;align-items:baseline}
+.pe-flow2 .pe-node b{font-weight:600}
+.pe-flow2 .pe-node::before{content:'';position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--dot,#9aa9a6)}
+.pe-flow2 .pe-add{--dot:#3d6fa8}.pe-flow2 .pe-heat{--dot:#c0573e}.pe-flow2 .pe-sample{--dot:#2f7d74}.pe-flow2 .pe-workup{--dot:#b58a3a}.pe-flow2 .pe-dry{--dot:#5b8c3a}.pe-flow2 .pe-split{--dot:#7a5aa6}
+.pe-flow2 .pe-add::before{background:#3d6fa8}
+.pe-flow2 .pe-chip{font-size:11.5px;padding:0 7px;border-radius:9px;background:#e7eef8;color:#2d4f78;white-space:nowrap}
+.pe-flow2 .pe-out{font-size:11.5px;color:#8a6a2a}
+.pe-flow2 .pe-product::before{background:#5b8c3a;border-color:#5b8c3a}
+.pe-flow2 .pe-product b{padding:1px 10px;border-radius:10px;background:#5b8c3a;color:#fff;font-size:12px}
+.pe-flow2 .pe-fork{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:6px}
+.pe-flow2 .pe-route{border-top:2px solid #e6d2a6;padding-top:4px}
+.pe-flow2 .pe-route-name{display:block;font-size:12px;font-weight:600;color:#7a5aa6;margin-bottom:2px}
+/* Process curve: stage bands, lanes, legend keys. */
+.pe-curve .pe-band{font-size:11px;font-weight:600;letter-spacing:.06em}
+.pe-curve .pe-break{font-size:10.5px;fill:#6b7b80}
+.pe-curve .pe-lane-label{font-size:11px;fill:#6b7b80}
+.pe-curve .pe-t0{font-weight:600;fill:#2f7d74}
+.pe-subtle .pe-key{display:inline-block;width:14px;height:4px;border-radius:2px;margin:0 3px 2px 8px;vertical-align:middle}
+.pe-subtle .pe-key:first-child{margin-left:0}
+.pe-key-temp{background:#b8553f}.pe-key-add{background:#3d6fa8;height:8px}.pe-key-sample{background:#2f7d74;width:8px!important;height:8px!important;border-radius:50%!important}
+.sp-visual .pe-curve svg,.overview-plan .pe-curve svg{max-width:860px}
+.paper .paper-figure{display:grid;grid-template-columns:1fr;gap:18px;align-items:start;margin:2px 0 12px;padding:10px 12px;border:1px solid var(--paper-rule,#dfe7e7);border-radius:6px}
+.paper .paper-figure .pe-curve svg{min-width:0}
+.paper .paper-figure .pe-subtle{font-size:10px;margin:2px 0 0}
+.paper .paper-figure .sp-flow .pe-flow-node{font-size:11px}
+@media print{.paper .paper-figure{break-inside:avoid}}

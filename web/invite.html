@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#29261f">
+<title>开通账号 · 研发工作台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23262522'/%3E%3Cpath d='M4 9h6l5 7h5M4 15h5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2.4' fill='%23c96442'/%3E%3C/svg%3E">
+<style>
+  :root { --ground: #f4f2ec; --surface: #fffefb; --ink: #29261f; --muted: #6b665c; --faint: #8f897c; --line: #e7e2d7; --line-strong: #d4cdbe;
+    --clay: #c96442; --clay-ink: #a14a2b; --clay-soft: #f6e8df; --bad-bg: #f8e5de; --bad-ink: #a0402c; --good-bg: #e9f0df; --good-ink: #4f7d33;
+    font: 16px/1.6 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; color: var(--ink); background: var(--ground); -webkit-text-size-adjust: 100%; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(1200px 600px at 50% -10%, #ece6da 0%, var(--ground) 60%); }
+  .card { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 26px 24px; box-shadow: 0 14px 40px rgba(41, 38, 31, .08); }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .brand b { font-size: 19px; letter-spacing: .04em; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+  .steps { display: flex; gap: 6px; margin: 4px 0 18px; }
+  .steps span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .steps span.on { background: var(--clay); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  input { width: 100%; height: 46px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 14px; font: inherit; color: var(--ink); background: #faf8f3; }
+  input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(201, 100, 66, .15); background: var(--surface); }
+  .code { letter-spacing: .4em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums; }
+  button { width: 100%; height: 48px; margin-top: 20px; border: 0; border-radius: 10px; background: var(--clay); color: #fff; font: inherit; font-weight: 700; letter-spacing: .08em; cursor: pointer; }
+  button.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); font-weight: 600; margin-top: 10px; }
+  button:disabled { opacity: .6; }
+  .error { display: none; margin-top: 14px; background: var(--bad-bg); color: var(--bad-ink); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+  .error.on { display: block; }
+  .qr { display: grid; place-items: center; margin: 6px 0 10px; }
+  .qr img, .qr canvas { width: 196px; height: 196px; image-rendering: pixelated; border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: #fff; }
+  .secret { font-family: Consolas, monospace; font-size: 14px; letter-spacing: .08em; background: #f4f1ea; border-radius: 8px; padding: 8px 10px; word-break: break-all; text-align: center; }
+  ol { margin: 6px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+  ol b { color: var(--ink); }
+  .codes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; font-family: Consolas, monospace; font-size: 16px; }
+  .codes span { background: #f4f1ea; border-radius: 8px; padding: 6px 10px; text-align: center; letter-spacing: .06em; }
+  .ok { background: var(--good-bg); color: var(--good-ink); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#29261f"/><path d="M4 9h6l5 7h5M4 15h5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#c96442"/></svg>
+    <b>研发工作台</b>
+  </div>
+  <div class="steps"><span id="s1" class="on"></span><span id="s2"></span><span id="s3"></span></div>
+
+  <section id="step1">
+    <h1>开通你的账号</h1>
+    <p class="sub" id="welcome">设好名字、账号和密码，下一步绑定手机上的验证器。</p>
+    <label for="name">你的名字（同事看到的就是它）</label>
+    <input id="name" type="text" autocomplete="name">
+    <label for="username">账号（登录用，字母、数字或汉字）</label>
+    <input id="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <label for="password">密码（至少 8 位）</label>
+    <input id="password" type="password" autocomplete="new-password">
+    <label for="password2">再输一次密码</label>
+    <input id="password2" type="password" autocomplete="new-password">
+    <button id="toStep2" type="button">下一步：绑定验证器</button>
+  </section>
+
+  <section id="step2" hidden>
+    <h1>绑定验证器</h1>
+    <ol>
+      <li>手机上装一个验证器：<b>Microsoft Authenticator</b>、<b>Google Authenticator</b> 或<b>腾讯身份验证器</b>都行。</li>
+      <li>在验证器里点"添加账号 / 扫描二维码"，扫下面这个码。</li>
+      <li>把验证器里"研发工作台"那一行现在的 6 位数填在下面。</li>
+    </ol>
+    <div class="qr" id="qr"></div>
+    <p class="sub" style="text-align:center;margin:0 0 4px">扫不了（比如就是在这台手机上打开的）：在验证器里选"手动输入密钥"，填这串字符</p>
+    <div class="secret" id="secret"></div>
+    <label for="code">验证器里的 6 位数</label>
+    <input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······">
+    <button id="finish" type="button">完成开通</button>
+    <button id="toStep1" class="ghost" type="button">上一步</button>
+  </section>
+
+  <section id="step3" hidden>
+    <h1>开通好了</h1>
+    <p class="ok">以后登录：账号 + 密码 + 验证器里的 6 位数。</p>
+    <p class="sub" style="margin-top:12px">下面是 8 个<b>备用码</b>：手机不在身边时，可以用一个代替验证码（每个只能用一次）。抄下来或截图存好，这一页关掉就看不到了。</p>
+    <div class="codes" id="codes"></div>
+    <button id="enter" type="button">进入工作台</button>
+  </section>
+  <div class="error" id="error"></div>
+</main>
+<script src="/web/vendor/qrcode.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const token = location.pathname.split('/').pop();
+  const show = (text) => { $('error').textContent = text; $('error').classList.toggle('on', !!text); };
+  const step = (n) => { [1, 2, 3].forEach((i) => { $('step' + i).hidden = i !== n; $('s' + i).classList.toggle('on', i <= n); }); show(''); };
+  let home = '/';
+  fetch('/api/auth/invite/' + encodeURIComponent(token)).then(async (r) => {
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || '邀请链接打不开');
+    if (data.name) { $('name').value = data.name; $('welcome').textContent = `${data.name}，你好。管理员邀请你用研发工作台（身份：${data.role}）。设好账号和密码，下一步绑定手机上的验证器。`; }
+    if (data.username) $('username').value = data.username;
+    const qr = qrcode(0, 'M'); qr.addData(data.uri); qr.make();
+    $('qr').innerHTML = qr.createImgTag(6, 0);
+    $('secret').textContent = data.secret.replace(/(.{4})/g, '$1 ').trim();
+    (data.name ? $('username') : $('name')).focus();
+  }).catch((error) => { show(error.message); $('step1').hidden = true; });
+  $('toStep2').onclick = () => {
+    if (!$('name').value.trim()) return show('写一下你的名字。');
+    if (!$('username').value.trim()) return show('设一个账号。');
+    if ($('password').value.length < 8) return show('密码至少 8 位。');
+    if ($('password').value !== $('password2').value) return show('两次输的密码不一样。');
+    step(2); $('code').focus();
+  };
+  $('toStep1').onclick = () => step(1);
+  $('finish').onclick = async () => {
+    $('finish').disabled = true; show('');
+    try {
+      const response = await fetch('/api/auth/invite/' + encodeURIComponent(token), {method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: $('name').value.trim(), username: $('username').value.trim(), password: $('password').value, code: $('code').value.trim()})});
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) { if (response.status === 409) step(1); throw new Error(data.detail || '没开通成功'); }
+      home = data.home || '/';
+      $('codes').replaceChildren(...data.recovery.map((code) => Object.assign(document.createElement('span'), {textContent: code})));
+      step(3);
+    } catch (error) { show(error.message); }
+    finally { $('finish').disabled = false; }
+  };
+  $('enter').onclick = () => location.replace(home);
+</script>
+</body>
+</html>
